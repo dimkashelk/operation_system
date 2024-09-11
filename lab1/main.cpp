@@ -3,7 +3,9 @@
 #include <iostream>
 #include <stdexcept>
 #include <cwchar>
-PROCESS_INFORMATION create_process(const std::string& process_name)
+#include <vector>
+#include <fstream>
+PROCESS_INFORMATION create_process(const std::string &process_name)
 {
   STARTUPINFO si;
   PROCESS_INFORMATION pi;
@@ -54,8 +56,18 @@ void create_threads(size_t count)
   }
   Sleep(1000);
 }
+std::vector< std::string > get_commands_from_file(const std::string& filename)
+{
+  std::ifstream file(filename);
+  std::vector< std::string > commands;
+  std::string line;
+  while (std::getline(file, line))
+  {
+    commands.push_back(line);
+  }
+  return commands;
+}
 int main()
 {
-
   return 0;
 }
