@@ -56,7 +56,7 @@ void create_threads(size_t count)
   }
   Sleep(1000);
 }
-std::vector< std::string > get_commands_from_file(const std::string& filename)
+std::vector< std::string > get_commands_from_file(const std::string &filename)
 {
   std::ifstream file(filename);
   std::vector< std::string > commands;
@@ -67,7 +67,17 @@ std::vector< std::string > get_commands_from_file(const std::string& filename)
   }
   return commands;
 }
+void do_commands_from_file(const std::string &filename)
+{
+  auto commands = get_commands_from_file(filename);
+  for (auto i: commands)
+  {
+    create_process(i);
+  }
+}
 int main()
 {
+  // do_commands_from_file("config.txt");
+  // create_threads(5);
   return 0;
 }
