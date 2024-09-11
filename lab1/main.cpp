@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <string>
+#include <iostream>
 #include <stdexcept>
 #include <cwchar>
 PROCESS_INFORMATION create_process(std::string process_name)
@@ -25,8 +26,36 @@ PROCESS_INFORMATION create_process(std::string process_name)
   }
   return pi;
 }
+typedef struct MyData
+{
+  size_t index;
+  size_t number;
+} MyData;
+DWORD WINAPI thread_function(LPVOID lpParameter)
+{
+  MyData param = *static_cast<MyData *>(lpParameter);
+  while (true)
+  {
+    std::cout << "I thread with number " << param.index <<
+              ". God gave me a number " << param.number <<
+              " and i work" << std::endl;
+    Sleep(100);
+  }
+}
+void create_threads(size_t count)
+{
+  HANDLE mHandle[count];
+  MyData mArg[count];
+  DWORD mId[count];
+  for (size_t i = 0; i < count; i++)
+  {
+    mArg[i] = {i, i + 15};
+    mHandle[i] = CreateThread(nullptr, 0, thread_function, mArg + i, 0, mId + i);
+  }
+  Sleep(1000);
+}
 int main()
 {
-  auto res = create_process("C:\\Windows\\notepad.exe");
+
   return 0;
 }
