@@ -1,1 +1,1 @@
-![alt text](https://github.com/dimkashelk/operation_system/tree/lab3/1253475.jpg)
+![alt text](https://github.com/dimkashelk/operation_system/blob/lab3/lab3/1253475.jpg)
