@@ -1,0 +1,3 @@
+notepad.exe our.txt
+calc.exe
+charmap.exe
