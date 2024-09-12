@@ -2,9 +2,10 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
-#include <cwchar>
+#include <chrono>
 #include <vector>
 #include <fstream>
+bool runFlag = false;
 PROCESS_INFORMATION create_process(const std::string &process_name)
 {
   STARTUPINFO si;
@@ -36,25 +37,33 @@ typedef struct MyData
 DWORD WINAPI thread_function(LPVOID lpParameter)
 {
   MyData param = *static_cast<MyData *>(lpParameter);
-  while (true)
+  while (runFlag)
   {
     std::cout << "I thread with number " << param.index <<
-              ". God gave me a number " << param.number <<
+              ". I have " << param.number << " seconds left to live " <<
               " and i work" << std::endl;
-    Sleep(100);
+    Sleep(1000);
+    param.number++;
   }
 }
-void create_threads(size_t count)
+void create_threads(size_t count, size_t time)
 {
   HANDLE mHandle[count];
   MyData mArg[count];
   DWORD mId[count];
+  runFlag = true;
   for (size_t i = 0; i < count; i++)
   {
-    mArg[i] = {i, i + 15};
+    mArg[i] = {i, 5};
     mHandle[i] = CreateThread(nullptr, 0, thread_function, mArg + i, 0, mId + i);
   }
-  Sleep(1000);
+  auto current_time = std::chrono::system_clock::now();
+  while ((std::chrono::system_clock::now() - current_time).count() < time)
+  {
+    Sleep(1000);
+  }
+  runFlag = false;
+  std::cout << "I kill ALL threads AXAXAXAXAXAXAXA" << std::endl;
 }
 std::vector< std::string > get_commands_from_file(const std::string &filename)
 {
@@ -75,9 +84,16 @@ void do_commands_from_file(const std::string &filename)
     create_process(i);
   }
 }
-int main()
+int main(int argc, char *argv[])
 {
   // do_commands_from_file("config.txt");
   // create_threads(5);
+  //if (argc != 3)
+  //{
+  //  return 1;
+  //}
+  //size_t count_threads = std::stoull(argv[1]);
+  //size_t time_thread = std::stoull(argv[2]);
+  //create_threads(count_threads, time_thread);
   return 0;
 }
