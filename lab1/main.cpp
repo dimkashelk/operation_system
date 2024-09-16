@@ -107,6 +107,9 @@ int get_thread_priority(HANDLE hThread) {
 bool set_thread_priority(HANDLE hThread, int nPriority) {
   return SetThreadPriority(hThread, nPriority);
 }
+BOOL set_thread_priority_boost(HANDLE hThread, BOOL bDisablePriorityBoost) {
+  return SetThreadPriorityBoost(hThread, bDisablePriorityBoost);
+}
 int main(int argc, char *argv[])
 {
   // do_commands_from_file("config.txt");
@@ -130,5 +133,6 @@ int main(int argc, char *argv[])
   //int new_thread_priority = THREAD_PRIORITY_LOWEST;
   //std::cout << "Change thread priority to " << new_thread_priority << " is " << set_thread_priority(GetCurrentThread(), new_thread_priority) << "\n";
   //std::cout << "Current thread priority: " << get_thread_priority(GetCurrentThread()) << "\n";
+  //std::cout << "Disable change thread priority is " << set_thread_priority_boost(GetCurrentThread(), false);
   return 0;
 }
