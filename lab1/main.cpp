@@ -119,6 +119,9 @@ void exit_process(UINT uExitCode) {
 BOOL terminate_process(HANDLE hProcess, UINT uExitCode) {
   return TerminateProcess(hProcess, uExitCode);
 }
+DWORD suspend_thread(HANDLE hThread) {
+  return SuspendThread(hThread);
+}
 int main(int argc, char *argv[])
 {
   // do_commands_from_file("config.txt");
@@ -148,5 +151,6 @@ int main(int argc, char *argv[])
   //std::cout << "Current thread boost status: " << status_thread << "\n";
   //exit_process(1234567);
   //terminate_process(GetCurrentProcess(), 123456);
+  //std::cout << "Count suspend of thread: " << suspend_thread(GetCurrentThread()) << "\n";
   return 0;
 }
