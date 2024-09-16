@@ -98,6 +98,9 @@ BOOL set_priority_boost(HANDLE hProcess, BOOL bDisablePriorityBoost)
 {
   return SetProcessPriorityBoost(hProcess, bDisablePriorityBoost);
 }
+BOOL get_priority_boost(HANDLE hProcess, PBOOL pDisablePriorityBoost) {
+  return GetProcessPriorityBoost(hProcess, pDisablePriorityBoost);
+}
 int main(int argc, char *argv[])
 {
   // do_commands_from_file("config.txt");
@@ -112,7 +115,10 @@ int main(int argc, char *argv[])
   //std::cout << "Current priority " << get_priority_class(GetCurrentProcess()) << "\n";
   //DWORD new_priority = 64;
   //std::cout << "Change priority to " << new_priority << " is " << set_priority_class(GetCurrentProcess(), new_priority) << "\n;
-  //BOOL boost = false;
+  //BOOL boost = true;
   //std::cout << "Change boost to " << boost << " is " << set_priority_boost(GetCurrentProcess(), boost) << "\n";
+  //BOOL status = false;
+  //get_priority_boost(GetCurrentProcess(), &status);
+  //std::cout << "Current boost status: " << status << "\n";
   return 0;
 }
