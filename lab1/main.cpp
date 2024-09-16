@@ -86,10 +86,12 @@ void do_commands_from_file(const std::string &filename)
     create_process(i);
   }
 }
-void get_priority_class(HANDLE hProcess)
+DWORD get_priority_class(HANDLE hProcess)
 {
-  auto priority = GetPriorityClass(hProcess);
-  std::cout << "Current priority " << priority << "\n";
+  return GetPriorityClass(hProcess);
+}
+void set_priority_class(HANDLE hProcess, DWORD dwPriorityClass) {
+  SetPriorityClass(hProcess, dwPriorityClass);
 }
 int main(int argc, char *argv[])
 {
@@ -102,6 +104,9 @@ int main(int argc, char *argv[])
   //size_t count_threads = std::stoull(argv[1]);
   //size_t time_thread = std::stoull(argv[2]);
   //create_threads(count_threads, time_thread);
-  // get_priority_class(GetCurrentProcess());
+  //std::cout << "Current priority " << get_priority_class(GetCurrentProcess()) << "\n";
+  //DWORD new_priority = 64;
+  //set_priority_class(GetCurrentProcess(), new_priority);
+  //std::cout << "Change priority to " << new_priority;
   return 0;
 }
