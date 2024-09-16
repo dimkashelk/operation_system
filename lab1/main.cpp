@@ -50,9 +50,9 @@ DWORD WINAPI thread_function(LPVOID lpParameter)
 }
 void create_threads(size_t count, size_t time)
 {
-  std::vector<HANDLE> mHandle(count);
-  std::vector<MyData> mArg(count);
-  std::vector<DWORD> mId(count);
+  std::vector< HANDLE > mHandle(count);
+  std::vector< MyData > mArg(count);
+  std::vector< DWORD > mId(count);
   runFlag = true;
   for (size_t i = 0; i < count; i++)
   {
@@ -90,8 +90,13 @@ DWORD get_priority_class(HANDLE hProcess)
 {
   return GetPriorityClass(hProcess);
 }
-void set_priority_class(HANDLE hProcess, DWORD dwPriorityClass) {
-  SetPriorityClass(hProcess, dwPriorityClass);
+BOOL set_priority_class(HANDLE hProcess, DWORD dwPriorityClass)
+{
+  return SetPriorityClass(hProcess, dwPriorityClass);
+}
+BOOL set_priority_boost(HANDLE hProcess, BOOL bDisablePriorityBoost)
+{
+  return SetProcessPriorityBoost(hProcess, bDisablePriorityBoost);
 }
 int main(int argc, char *argv[])
 {
@@ -106,7 +111,8 @@ int main(int argc, char *argv[])
   //create_threads(count_threads, time_thread);
   //std::cout << "Current priority " << get_priority_class(GetCurrentProcess()) << "\n";
   //DWORD new_priority = 64;
-  //set_priority_class(GetCurrentProcess(), new_priority);
-  //std::cout << "Change priority to " << new_priority;
+  //std::cout << "Change priority to " << new_priority << " is " << set_priority_class(GetCurrentProcess(), new_priority) << "\n;
+  //BOOL boost = false;
+  //std::cout << "Change boost to " << boost << " is " << set_priority_boost(GetCurrentProcess(), boost) << "\n";
   return 0;
 }
