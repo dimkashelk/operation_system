@@ -122,6 +122,9 @@ BOOL terminate_process(HANDLE hProcess, UINT uExitCode) {
 DWORD suspend_thread(HANDLE hThread) {
   return SuspendThread(hThread);
 }
+DWORD resume_thread(HANDLE hThread) {
+  return ResumeThread(hThread);
+}
 int main(int argc, char *argv[])
 {
   // do_commands_from_file("config.txt");
@@ -152,5 +155,6 @@ int main(int argc, char *argv[])
   //exit_process(1234567);
   //terminate_process(GetCurrentProcess(), 123456);
   //std::cout << "Count suspend of thread: " << suspend_thread(GetCurrentThread()) << "\n";
+  //std::cout << "Count suspend of thread: " << resume_thread(GetCurrentThread()) << "\n";
   return 0;
 }
