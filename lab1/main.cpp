@@ -116,6 +116,9 @@ BOOL get_thread_priority_boost(HANDLE hThread, PBOOL pDisablePriorityBoost) {
 void exit_process(UINT uExitCode) {
   ExitProcess(uExitCode);
 }
+BOOL terminate_process(HANDLE hProcess, UINT uExitCode) {
+  return TerminateProcess(hProcess, uExitCode);
+}
 int main(int argc, char *argv[])
 {
   // do_commands_from_file("config.txt");
@@ -144,5 +147,6 @@ int main(int argc, char *argv[])
   //get_thread_priority_boost(GetCurrentThread(), &status_thread);
   //std::cout << "Current thread boost status: " << status_thread << "\n";
   //exit_process(1234567);
+  //terminate_process(GetCurrentProcess(), 123456);
   return 0;
 }
