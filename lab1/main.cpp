@@ -5,6 +5,7 @@
 #include <chrono>
 #include <vector>
 #include <fstream>
+#include <processthreadsapi.h>
 bool runFlag = false;
 PROCESS_INFORMATION create_process(const std::string &process_name)
 {
@@ -45,17 +46,18 @@ DWORD WINAPI thread_function(LPVOID lpParameter)
     Sleep(1000);
     param.number++;
   }
+  return 0;
 }
 void create_threads(size_t count, size_t time)
 {
-  HANDLE mHandle[count];
-  MyData mArg[count];
-  DWORD mId[count];
+  std::vector<HANDLE> mHandle(count);
+  std::vector<MyData> mArg(count);
+  std::vector<DWORD> mId(count);
   runFlag = true;
   for (size_t i = 0; i < count; i++)
   {
     mArg[i] = {i, 5};
-    mHandle[i] = CreateThread(nullptr, 0, thread_function, mArg + i, 0, mId + i);
+    mHandle[i] = CreateThread(nullptr, 0, thread_function, mArg.data() + i, 0, mId.data() + i);
   }
   auto current_time = std::chrono::system_clock::now();
   while ((std::chrono::system_clock::now() - current_time).count() < time)
@@ -84,6 +86,11 @@ void do_commands_from_file(const std::string &filename)
     create_process(i);
   }
 }
+void get_priority_class(HANDLE hProcess)
+{
+  auto priority = GetPriorityClass(hProcess);
+  std::cout << "Current priority " << priority << "\n";
+}
 int main(int argc, char *argv[])
 {
   // do_commands_from_file("config.txt");
@@ -95,5 +102,6 @@ int main(int argc, char *argv[])
   //size_t count_threads = std::stoull(argv[1]);
   //size_t time_thread = std::stoull(argv[2]);
   //create_threads(count_threads, time_thread);
+  // get_priority_class(GetCurrentProcess());
   return 0;
 }
