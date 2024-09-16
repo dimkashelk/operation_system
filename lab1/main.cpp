@@ -104,6 +104,9 @@ BOOL get_priority_boost(HANDLE hProcess, PBOOL pDisablePriorityBoost) {
 int get_thread_priority(HANDLE hThread) {
   return GetThreadPriority(hThread);
 }
+bool set_thread_priority(HANDLE hThread, int nPriority) {
+  return SetThreadPriority(hThread, nPriority);
+}
 int main(int argc, char *argv[])
 {
   // do_commands_from_file("config.txt");
@@ -123,6 +126,9 @@ int main(int argc, char *argv[])
   //BOOL status = false;
   //get_priority_boost(GetCurrentProcess(), &status);
   //std::cout << "Current boost status: " << status << "\n";
+  //std::cout << "Current thread priority: " << get_thread_priority(GetCurrentThread()) << "\n";
+  //int new_thread_priority = THREAD_PRIORITY_LOWEST;
+  //std::cout << "Change thread priority to " << new_thread_priority << " is " << set_thread_priority(GetCurrentThread(), new_thread_priority) << "\n";
   //std::cout << "Current thread priority: " << get_thread_priority(GetCurrentThread()) << "\n";
   return 0;
 }
