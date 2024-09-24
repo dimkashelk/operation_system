@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <aclapi.h>
+#include <sddl.h>
 std::string get_new_command(std::string &command, int number)
 {
   std::string new_command = command;
@@ -99,6 +101,96 @@ void level_1(int k)
   CloseHandle(timer);
   exit(0);
 }
+void print_error(const std::string &error)
+{
+  std::cout << error << " failed. Error: " << GetLastError() << "\n";
+}
+void level_3()
+{
+  std::string fileName = "testfile.txt";
+  PSID pSid = nullptr;
+  PACL pDacl = nullptr;
+  PSECURITY_DESCRIPTOR pSD = nullptr;
+  std::string userName = "notebook";
+
+  SID_NAME_USE sidType;
+  char domainName[256];
+  DWORD sidSize = 0, domainSize = 256;
+  LookupAccountName(nullptr, userName.c_str(), nullptr, &sidSize, domainName, &domainSize, &sidType);
+  pSid = (PSID) malloc(sidSize);
+  if (!LookupAccountName(nullptr, userName.c_str(), pSid, &sidSize, domainName, &domainSize, &sidType))
+  {
+    print_error("LookupAccountName");
+    free(pSid);
+    exit(1);
+  }
+
+  DWORD dwRes = GetNamedSecurityInfoA(fileName.c_str(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr,
+                                      &pDacl, nullptr, &pSD);
+  if (dwRes != ERROR_SUCCESS)
+  {
+    print_error("GetNamedSecurityInfoA");
+    free(pSid);
+    exit(1);
+  }
+
+  TRUSTEE trustee;
+  ZeroMemory(&trustee, sizeof(TRUSTEE));
+  trustee.TrusteeForm = TRUSTEE_IS_SID;
+  trustee.ptstrName = (LPSTR) pSid;
+
+  DWORD rights = 0;
+  if (GetEffectiveRightsFromAclA(pDacl, &trustee, &rights) == ERROR_SUCCESS)
+  {
+    printf("Current rights for user: 0x%lx\n", rights);
+  }
+  else
+  {
+    print_error("GetEffectiveRightsFromAclA");
+  }
+
+  EXPLICIT_ACCESS ea;
+  ZeroMemory(&ea, sizeof(EXPLICIT_ACCESS));
+  ea.grfAccessPermissions = GENERIC_READ;
+  ea.grfAccessMode = GRANT_ACCESS;
+  ea.grfInheritance = NO_INHERITANCE;
+  ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+  ea.Trustee.ptstrName = (LPSTR) pSid;
+  PACL pNewDacl = nullptr;
+  dwRes = SetEntriesInAcl(1, &ea, pDacl, &pNewDacl);
+  if (dwRes != ERROR_SUCCESS)
+  {
+    print_error("SetEntriesInAcl");
+    free(pSid);
+    LocalFree(pSD);
+    exit(1);
+  }
+
+  dwRes = SetNamedSecurityInfoA((LPSTR) fileName.c_str(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr,
+                                pNewDacl, nullptr);
+  if (dwRes != ERROR_SUCCESS)
+  {
+    print_error("SetNamedSecurityInfoA");
+    free(pSid);
+    LocalFree(pSD);
+    LocalFree(pNewDacl);
+    exit(1);
+  }
+  printf("Successfully updated DACL for file.\n");
+
+  if (GetEffectiveRightsFromAclA(pNewDacl, &trustee, &rights) == ERROR_SUCCESS)
+  {
+    printf("Updated rights for user: 0x%lx\n", rights);
+  }
+  else
+  {
+    print_error("GetEffectiveRightsFromAclA");
+  }
+
+  free(pSid);
+  LocalFree(pSD);
+  LocalFree(pNewDacl);
+}
 int main(int argc, char *argv[])
 {
   //                           level 1
@@ -127,5 +219,9 @@ int main(int argc, char *argv[])
   //}
   //level_2(n, k);
   //                           level 2
+
+  //                           level 3
+  //level_3();
+  //                           level 3
   return 0;
 }
