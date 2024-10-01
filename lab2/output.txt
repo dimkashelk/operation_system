@@ -1,0 +1,11 @@
+SON PARAM: pid=145068 ppid=145067
+SON process finished.
+Starting levels of process interaction:
+
+LEVEL 2: FATHER PARAM: pid=145067 ppid=38522
+LEVEL 2: Child process finished.
+
+LEVEL 3A: FATHER PARAM: pid=145067 ppid=38522
+LEVEL 3A: Father process exiting.
+SON PARAM: pid=145217 ppid=981
+SON process finished.
