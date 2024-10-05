@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <iostream>
 #include <string>
+#include <sstream>
 void lab1_1a()
 {
   const char *semaphoreName = "Local\\MySyncSemaphore";
@@ -122,9 +123,64 @@ void lab1_2a(int argc, char *argv[])
     }
   }
 }
+void lab1_1b()
+{
+  const char *eventName = "Global\\MyNamedEvent";
+  SECURITY_ATTRIBUTES *sa = new SECURITY_ATTRIBUTES;
+  sa->bInheritHandle = TRUE;
+  sa->lpSecurityDescriptor = NULL;
+  sa->nLength = sizeof(sa);
+  HANDLE hEvent = CreateEvent(sa, FALSE, TRUE, eventName);
+  if (hEvent == NULL)
+  {
+    std::cerr << "Error creating event: " << GetLastError() << std::endl;
+    exit(1);
+  }
+  STARTUPINFOA si = {sizeof(si)};
+  PROCESS_INFORMATION pi;
+  std::stringstream ss;
+  ss << hEvent;
+  std::string eventHandleStr = ss.str();
+  std::string childCommand = R"(C:\Users\notebook\Documents\operation_system\lab6\lab1\child_1b.exe )" + eventHandleStr;
+  if (!CreateProcessA(NULL, &childCommand[0], sa, NULL, TRUE, 0, NULL, NULL, &si, &pi))
+  {
+    std::cerr << "Error creating child process: " << GetLastError() << std::endl;
+    CloseHandle(hEvent);
+    exit(1);
+  }
+  std::cout << "Parent is starting." << std::endl;
+  std::string input;
+  bool running = true;
+  while (running)
+  {
+    std::cout << "Parent wait: " << WaitForSingleObject(hEvent, INFINITE) << std::endl;
+    std::cout << "Parent has control. Enter a command (next to pass control, exit to quit):" << std::endl;
+    std::getline(std::cin, input);
+    if (input == "next")
+    {
+      std::cout << "Parent passing control to child." << std::endl;
+      SetEvent(hEvent);
+    }
+    else if (input == "exit")
+    {
+      std::cout << "Parent exiting." << std::endl;
+      running = false;
+      SetEvent(hEvent);
+    }
+    else
+    {
+      std::cout << "You entered: " << input << std::endl;
+    }
+  }
+  WaitForSingleObject(pi.hProcess, INFINITE);
+  CloseHandle(pi.hProcess);
+  CloseHandle(pi.hThread);
+  CloseHandle(hEvent);
+}
 int main(int argc, char *argv[])
 {
   //lab1_1a();
   //lab1_2a(argc, argv);
+  lab1_1b();
   return 0;
 }
