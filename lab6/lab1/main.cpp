@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <iostream>
 #include <string>
+#include <sstream>
 void lab1_1a()
 {
   const char *semaphoreName = "Local\\MySyncSemaphore";
@@ -122,9 +123,53 @@ void lab1_2a(int argc, char *argv[])
     }
   }
 }
+void lab1_1b()
+{
+  SECURITY_ATTRIBUTES SecurityAttributes;
+  SecurityAttributes.bInheritHandle = TRUE;
+  SecurityAttributes.lpSecurityDescriptor = NULL;
+  SecurityAttributes.nLength = sizeof(SecurityAttributes);
+  HANDLE hEvent;
+  hEvent = CreateEvent(&SecurityAttributes, FALSE, TRUE, NULL);
+  std::string path = "./child_1b.exe " + std::to_string((int) hEvent);
+  STARTUPINFO StartInfo;
+  memset(&StartInfo, 0, sizeof(StartInfo));
+  StartInfo.cb = sizeof(StartInfo);
+  PROCESS_INFORMATION ProcessInf;
+  if (!CreateProcess(NULL, const_cast<char *>(path.c_str()),
+                     NULL, NULL, TRUE,
+                     CREATE_NEW_CONSOLE, NULL, NULL,
+                     &StartInfo, &ProcessInf))
+  {
+    std::cout << "Could not create child process!\n";
+    CloseHandle(hEvent);
+    exit(1);
+  }
+  while (TRUE)
+  {
+    WaitForSingleObject(hEvent, INFINITE);
+    std::cout << "Parent wait message: \n";
+    std::string str;
+    std::getline(std::cin, str);
+    while (str != "next")
+    {
+      if (str == "exit")
+      {
+        SetEvent(hEvent);
+        CloseHandle(hEvent);
+        exit(0);
+      }
+      std::cout << "You enter: " << str << "\n";
+      std::getline(std::cin, str);
+    }
+    std::cout << "Change to child!\n";
+    SetEvent(hEvent);
+  }
+}
 int main(int argc, char *argv[])
 {
   //lab1_1a();
   //lab1_2a(argc, argv);
+  //lab1_1b();
   return 0;
 }
