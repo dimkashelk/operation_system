@@ -125,62 +125,51 @@ void lab1_2a(int argc, char *argv[])
 }
 void lab1_1b()
 {
-  const char *eventName = "Global\\MyNamedEvent";
-  SECURITY_ATTRIBUTES *sa = new SECURITY_ATTRIBUTES;
-  sa->bInheritHandle = TRUE;
-  sa->lpSecurityDescriptor = NULL;
-  sa->nLength = sizeof(sa);
-  HANDLE hEvent = CreateEvent(sa, FALSE, TRUE, eventName);
-  if (hEvent == NULL)
+  SECURITY_ATTRIBUTES SecurityAttributes;
+  SecurityAttributes.bInheritHandle = TRUE;
+  SecurityAttributes.lpSecurityDescriptor = NULL;
+  SecurityAttributes.nLength = sizeof(SecurityAttributes);
+  HANDLE hEvent;
+  hEvent = CreateEvent(&SecurityAttributes, FALSE, TRUE, NULL);
+  std::string path = "./child_1b.exe " + std::to_string((int) hEvent);
+  STARTUPINFO StartInfo;
+  memset(&StartInfo, 0, sizeof(StartInfo));
+  StartInfo.cb = sizeof(StartInfo);
+  PROCESS_INFORMATION ProcessInf;
+  if (!CreateProcess(NULL, const_cast<char *>(path.c_str()),
+                     NULL, NULL, TRUE,
+                     CREATE_NEW_CONSOLE, NULL, NULL,
+                     &StartInfo, &ProcessInf))
   {
-    std::cerr << "Error creating event: " << GetLastError() << std::endl;
-    exit(1);
-  }
-  STARTUPINFOA si = {sizeof(si)};
-  PROCESS_INFORMATION pi;
-  std::stringstream ss;
-  ss << hEvent;
-  std::string eventHandleStr = ss.str();
-  std::string childCommand = R"(C:\Users\notebook\Documents\operation_system\lab6\lab1\child_1b.exe )" + eventHandleStr;
-  if (!CreateProcessA(NULL, &childCommand[0], sa, NULL, TRUE, 0, NULL, NULL, &si, &pi))
-  {
-    std::cerr << "Error creating child process: " << GetLastError() << std::endl;
+    std::cout << "Could not create child process!\n";
     CloseHandle(hEvent);
     exit(1);
   }
-  std::cout << "Parent is starting." << std::endl;
-  std::string input;
-  bool running = true;
-  while (running)
+  while (TRUE)
   {
-    std::cout << "Parent wait: " << WaitForSingleObject(hEvent, INFINITE) << std::endl;
-    std::cout << "Parent has control. Enter a command (next to pass control, exit to quit):" << std::endl;
-    std::getline(std::cin, input);
-    if (input == "next")
+    WaitForSingleObject(hEvent, INFINITE);
+    std::cout << "Parent wait message: \n";
+    std::string str;
+    std::getline(std::cin, str);
+    while (str != "next")
     {
-      std::cout << "Parent passing control to child." << std::endl;
-      SetEvent(hEvent);
+      if (str == "exit")
+      {
+        SetEvent(hEvent);
+        CloseHandle(hEvent);
+        exit(0);
+      }
+      std::cout << "You enter: " << str << "\n";
+      std::getline(std::cin, str);
     }
-    else if (input == "exit")
-    {
-      std::cout << "Parent exiting." << std::endl;
-      running = false;
-      SetEvent(hEvent);
-    }
-    else
-    {
-      std::cout << "You entered: " << input << std::endl;
-    }
+    std::cout << "Change to child!\n";
+    SetEvent(hEvent);
   }
-  WaitForSingleObject(pi.hProcess, INFINITE);
-  CloseHandle(pi.hProcess);
-  CloseHandle(pi.hThread);
-  CloseHandle(hEvent);
 }
 int main(int argc, char *argv[])
 {
   //lab1_1a();
   //lab1_2a(argc, argv);
-  lab1_1b();
+  //lab1_1b();
   return 0;
 }
