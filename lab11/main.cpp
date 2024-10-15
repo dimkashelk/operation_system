@@ -60,7 +60,97 @@ void level_1a()
   std::cout << "File changed." << std::endl;
   exit(0);
 }
+void level_2a()
+{
+
+  STARTUPINFO si;
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&si, sizeof(si));
+  si.cb = sizeof(si);
+  ZeroMemory(&pi, sizeof(pi));
+
+  // Создание процесса производителя
+  if (!CreateProcess(
+    "producer.exe", // Имя файла исполняемого процесса
+    nullptr,        // Командная строка
+    nullptr,        // Атрибуты процесса
+    nullptr,        // Атрибуты потока
+    FALSE,          // Унаследование дескрипторов
+    0,              // Флаги создания
+    nullptr,        // Блок среды
+    nullptr,        // Текущий каталог
+    &si,            // Структура STARTUPINFO
+    &pi             // Структура PROCESS_INFORMATION
+  ))
+  {
+    std::cerr << "Couldn't create a producer process: " << GetLastError() << std::endl;
+    exit(1);
+  }
+  Sleep(500);
+
+  // Создание процесса шифровальщика
+  if (!CreateProcess(
+    "encryptor.exe", // Имя файла исполняемого процесса
+    nullptr,         // Командная строка
+    nullptr,         // Атрибуты процесса
+    nullptr,         // Атрибуты потока
+    FALSE,           // Унаследование дескрипторов
+    0,               // Флаги создания
+    nullptr,         // Блок среды
+    nullptr,         // Текущий каталог
+    &si,             // Структура STARTUPINFO
+    &pi              // Структура PROCESS_INFORMATION
+  ))
+  {
+    std::cerr << "Couldn't create a cryptographer process: " << GetLastError() << std::endl;
+    exit(1);
+  }
+  Sleep(500);
+
+  // Создание процесса дешифровальщика
+  if (!CreateProcess(
+    "decryptor.exe", // Имя файла исполняемого процесса
+    nullptr,         // Командная строка
+    nullptr,         // Атрибуты процесса
+    nullptr,         // Атрибуты потока
+    FALSE,           // Унаследование дескрипторов
+    0,               // Флаги создания
+    nullptr,         // Блок среды
+    nullptr,         // Текущий каталог
+    &si,             // Структура STARTUPINFO
+    &pi              // Структура PROCESS_INFORMATION
+  ))
+  {
+    std::cerr << "Couldn't create decryptor process: " << GetLastError() << std::endl;
+    exit(1);
+  }
+  Sleep(500);
+
+  // Создание процесса потребителя
+  if (!CreateProcess(
+    "consumer.exe", // Имя файла исполняемого процесса
+    nullptr,        // Командная строка
+    nullptr,        // Атрибуты процесса
+    nullptr,        // Атрибуты потока
+    FALSE,          // Унаследование дескрипторов
+    0,              // Флаги создания
+    nullptr,        // Блок среды
+    nullptr,        // Текущий каталог
+    &si,            // Структура STARTUPINFO
+    &pi             // Структура PROCESS_INFORMATION
+  ))
+  {
+    std::cerr << "Couldn't create a consumer process: " << GetLastError() << std::endl;
+    exit(1);
+  }
+  Sleep(1000);
+  WaitForSingleObject(pi.hProcess, INFINITE);
+  CloseHandle(pi.hProcess);
+  CloseHandle(pi.hThread);
+  exit(0);
+}
 int main()
 {
   // level_1a();
+  level_2a();
 }
