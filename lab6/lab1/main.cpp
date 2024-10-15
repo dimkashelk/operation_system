@@ -131,7 +131,7 @@ void lab1_1b()
   SecurityAttributes.nLength = sizeof(SecurityAttributes);
   HANDLE hEvent;
   hEvent = CreateEvent(&SecurityAttributes, FALSE, TRUE, NULL);
-  std::string path = "./child_1b.exe " + std::to_string((int) hEvent);
+  std::string path = "./child_1_1b.exe " + std::to_string((int) hEvent);
   STARTUPINFO StartInfo;
   memset(&StartInfo, 0, sizeof(StartInfo));
   StartInfo.cb = sizeof(StartInfo);
