@@ -1,1 +1,2 @@
-![alt text](https://github.com/dimkashelk/operation_system/tree/lab3/1253475.jpg)
+лабы не будет, делайте сами
+соси виндовс
